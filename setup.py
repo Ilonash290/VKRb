@@ -13,5 +13,5 @@ setup(
     ],
     author="Ilona Shlyakhtina",
     description="A library for optimizing the number of salesmans",
-    python_requires='>=3.9.6',
+    python_requires='>=3.13',
 )
