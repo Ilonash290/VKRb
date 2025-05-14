@@ -1,1 +1,2 @@
+from .salesman_optimization import SalesmanOptimization
 
