@@ -15,7 +15,7 @@ def read_input_file(file_path):
     
     for line in lines:
         line = line.strip()
-        if not line:  # Пропускаем пустые строки
+        if not line:
             continue
         if line.startswith("dist_matrix:"):
             reading_matrix = True
@@ -31,17 +31,6 @@ def read_input_file(file_path):
 
 class SalesmanOptimization:
     def __init__(self, dist_matrix, speed, work_time, pop_size=200, generations=300, mutation_rate=0.015, elite_size_ratio=0.1):
-        """Инициализация оптимизатора посещения.
-        
-        Args:
-            dist_matrix (np.ndarray): Матрица расстояний (m+1 x m+1), где 0 — склад.
-            speed (float): Скорость коммивояжеров в км/ч.
-            work_time (float): Время работы коммивояжеров в часах.
-            pop_size (int): Размер популяции.
-            generations (int): Количество поколений.
-            mutation_rate (float): Вероятность мутации.
-            elite_size_ratio (float): Доля элитных особей.
-        """
         self.dist_matrix = np.array(dist_matrix)
         self.speed = speed
         self.work_time = work_time
@@ -59,7 +48,6 @@ class SalesmanOptimization:
 
     @classmethod
     def from_file(cls, file_path):
-        """Создание экземпляра класса из файла."""
         data = read_input_file(file_path)
         return cls(
             speed=data['speed'],
@@ -68,7 +56,6 @@ class SalesmanOptimization:
         )
 
     def greedy_route(self, salesman_order_indices):
-        """Жадный алгоритм построения маршрута для коммивояжера."""
         if not salesman_order_indices:
             return [], 0
         route = []
@@ -85,13 +72,11 @@ class SalesmanOptimization:
         return route, total_distance
 
     def calculate_time(self, salesman_order_indices):
-        """Расчет времени посещения для коммивояжера."""
         route, total_distance = self.greedy_route(salesman_order_indices)
         delivery_time = total_distance / self.speed
         return delivery_time, route
 
     def fitness(self, chromosome, n):
-        """Функция приспособленности."""
         salesman_assignments = [[] for _ in range(n)]
         for order_idx, salesman in enumerate(chromosome):
             salesman_assignments[salesman].append(self.orders_indices[order_idx])
@@ -112,11 +97,9 @@ class SalesmanOptimization:
         return used_salesman_count + 0.1 * total_time
 
     def initialize_population(self, n):
-        """Инициализация популяции."""
         self.population = [[random.randint(0, n-1) for _ in range(self.m)] for _ in range(self.pop_size)]
 
     def genetic_algorithm_step(self, n):
-        """Один шаг генетического алгоритма."""
         if self.population is None:
             self.initialize_population(n)
         
@@ -154,7 +137,6 @@ class SalesmanOptimization:
         return False
 
     def find_min_salesmans(self):
-        """Поиск минимального количества коммивояжеров."""
         low = 1
         high = self.m
         min_salesmans = None
@@ -194,7 +176,6 @@ class SalesmanOptimization:
             return None, None
 
     def plot_routes(self, used_salesmans, best_routes, output_file='routes.png'):
-        """Визуализация маршрутов коммивояжеров."""
         coords = MDS(n_components=2, dissimilarity='precomputed', random_state=42).fit_transform(self.dist_matrix)
         pos = {i: (coords[i, 0], coords[i, 1]) for i in range(self.m + 1)}
         
@@ -238,11 +219,3 @@ class SalesmanOptimization:
         plt.legend(handles=handles)
         plt.title("Маршруты коммивояжеров")
         plt.savefig(output_file)
-
-# Пример использования
-if __name__ == "__main__":
-    file_path = "input_data.txt"
-    optimizer = SalesmanOptimization.from_file(file_path)
-    used_salesmans, best_routes = optimizer.find_min_salesmans()
-    if used_salesmans is not None:
-        optimizer.plot_routes(used_salesmans, best_routes, 'routes.png')
