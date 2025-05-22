@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import networkx as nx
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.manifold import MDS
 import seaborn as sns
@@ -47,12 +49,15 @@ class SalesmanOptimization:
         self.current_generation = 0
 
     @classmethod
-    def from_file(cls, file_path):
+    def from_file(cls, file_path, pop_size=200, generations=300, mutation_rate=0.015):
         data = read_input_file(file_path)
         return cls(
             speed=data['speed'],
             work_time=data['work_time'],
-            dist_matrix=data['dist_matrix']
+            dist_matrix=data['dist_matrix'],
+            pop_size=pop_size,
+            generations=generations,
+            mutation_rate=mutation_rate
         )
 
     def greedy_route(self, salesman_order_indices):
@@ -190,18 +195,22 @@ class SalesmanOptimization:
         colors = sns.color_palette("husl", used_salesmans)
         
         order_colors = {}
+        used_idx = 0
         for idx, route in enumerate(best_routes):
             if route:
                 for order in route:
-                    order_colors[order] = colors[idx]
+                    order_colors[order] = colors[used_idx]
+                used_idx += 1
         
+        used_idx = 0
         for idx, route in enumerate(best_routes):
             if route:
                 full_route = [self.warehouse_index] + route + [self.warehouse_index]
                 route_edges = [(full_route[j], full_route[j+1]) for j in range(len(full_route) - 1)]
-                edge_colors = [colors[idx]] * len(route_edges)
+                edge_colors = [colors[used_idx]] * len(route_edges)
                 nx.draw_networkx_edges(G, pos, edgelist=route_edges, edge_color=edge_colors,
-                                       width=2, arrowstyle='-|>', arrowsize=30, label=f'Коммивояжер {idx+1}', arrows=True)
+                                       width=2, arrowstyle='-|>', arrowsize=30, label=f'Коммивояжер {used_idx+1}', arrows=True)
+                used_idx += 1
                 route_edge_labels = {(u, v): f"{G[u][v]['weight']:.2f}" for u, v in route_edges}
                 nx.draw_networkx_edge_labels(G, pos, edge_labels=route_edge_labels, font_color='black', font_size=16)
         
@@ -219,3 +228,4 @@ class SalesmanOptimization:
         plt.legend(handles=handles)
         plt.title("Маршруты коммивояжеров")
         plt.savefig(output_file)
+        plt.close()
