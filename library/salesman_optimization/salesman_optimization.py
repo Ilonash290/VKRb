@@ -6,6 +6,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.manifold import MDS
 import seaborn as sns
+
+
 def read_input_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
