@@ -6,7 +6,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.manifold import MDS
 import seaborn as sns
-
 def read_input_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -98,8 +97,8 @@ class SalesmanOptimization:
                     total_time_excess += (delivery_time - self.work_time)
         
         if total_time_excess > 0:
-            return 10000 + 100 * total_time_excess + used_salesman_count
-        return used_salesman_count + 0.1 * total_time
+            return (-1) * (10000 + 100 * total_time_excess + used_salesman_count)
+        return (-1) * used_salesman_count
 
     def initialize_population(self, n):
         self.population = [[random.randint(0, n-1) for _ in range(self.m)] for _ in range(self.pop_size)]
@@ -109,18 +108,18 @@ class SalesmanOptimization:
             self.initialize_population(n)
         
         fitness_scores = [self.fitness(chrom, n) for chrom in self.population]
-        self.best_score = min(fitness_scores)
+        self.best_score = max(fitness_scores)
         self.best_chrom = self.population[fitness_scores.index(self.best_score)]
         
-        if self.best_score < 10000:
+        if self.best_score > -10000:
             return True
         
-        sorted_population = sorted(zip(self.population, fitness_scores), key=lambda x: x[1])
+        sorted_population = sorted(zip(self.population, fitness_scores), key=lambda x: x[1], reverse=True)
         new_population = [x[0] for x in sorted_population[:self.elite_size]]
         
         while len(new_population) < self.pop_size:
             tournament = random.sample(list(zip(self.population, fitness_scores)), 3)
-            winner = min(tournament, key=lambda x: x[1])[0]
+            winner = max(tournament, key=lambda x: x[1])[0]
             new_population.append(winner[:])
         
         for i in range(0, self.pop_size, 2):
