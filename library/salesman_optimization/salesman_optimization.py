@@ -32,25 +32,69 @@ def read_input_file(file_path):
     data['dist_matrix'] = np.array(matrix)
     return data
 
+def get_default_params(m):
+    if m <= 10:
+        pop_size = 200
+        generations = 10
+        mutation_rate = 0.01
+    elif m > 10 and m <= 15:
+        pop_size = 200
+        generations = 20
+        mutation_rate = 0.015
+    elif m > 15 and m <= 25:
+        pop_size = 200
+        generations = 350
+        mutation_rate = 0.015
+    elif m > 25 and m <= 35:
+        pop_size = 250
+        generations = 1500
+        mutation_rate = 0.015
+    elif m > 35 and m <= 50:
+        pop_size = 350
+        generations = 4500
+        mutation_rate = 0.015
+    elif m > 50 and m <= 60:
+        pop_size = 350
+        generations = 5500
+        mutation_rate = 0.02
+    elif m > 60 and m <= 70:
+        pop_size = 350
+        generations = 7000
+        mutation_rate = 0.02
+    else:
+        pop_size = 400
+        generations = 12000
+        mutation_rate = 0.02
+    return {'pop_size': pop_size, 'generations': generations, 'mutation_rate': mutation_rate}
+
 class SalesmanOptimization:
-    def __init__(self, dist_matrix, speed, work_time, pop_size=200, generations=300, mutation_rate=0.015, elite_size_ratio=0.1):
+    def __init__(self, dist_matrix, speed, work_time, pop_size=None, generations=None, mutation_rate=None, elite_size_ratio=0.1):
         self.dist_matrix = np.array(dist_matrix)
         self.speed = speed
         self.work_time = work_time
-        self.pop_size = pop_size
-        self.generations = generations
-        self.mutation_rate = mutation_rate
-        self.elite_size = int(pop_size * elite_size_ratio)
         self.m = self.dist_matrix.shape[0] - 1  # Количество городов
         self.warehouse_index = 0
         self.orders_indices = list(range(1, self.m + 1))
+
+        if pop_size is None or generations is None or mutation_rate is None:
+            default_params = get_default_params(self.m)
+            self.pop_size = pop_size if pop_size is not None else default_params['pop_size']
+            self.generations = generations if generations is not None else default_params['generations']
+            self.mutation_rate = mutation_rate if mutation_rate is not None else default_params['mutation_rate']
+        else:
+            self.pop_size = pop_size
+            self.generations = generations
+            self.mutation_rate = mutation_rate
+
+        self.elite_size = int(self.pop_size * elite_size_ratio)
+
         self.population = None
         self.best_chrom = None
         self.best_score = None
         self.current_generation = 0
 
     @classmethod
-    def from_file(cls, file_path, pop_size=200, generations=300, mutation_rate=0.015):
+    def from_file(cls, file_path, pop_size=None, generations=None, mutation_rate=None):
         data = read_input_file(file_path)
         return cls(
             speed=data['speed'],
