@@ -31,16 +31,18 @@ def optimize():
     file.save(file_path)
     
     try:
-        pop_size = request.form.get('pop_size')
-        generations = request.form.get('generations')
-        mutation_rate = request.form.get('mutation_rate')
+        params_mode = request.form.get('upload_params_mode', 'default')
         kwargs = {}
-        if pop_size is not None:
-            kwargs['pop_size'] = int(pop_size)
-        if generations is not None:
-            kwargs['generations'] = int(generations)
-        if mutation_rate is not None:
-            kwargs['mutation_rate'] = float(mutation_rate)
+        if params_mode == 'custom':
+            pop_size = request.form.get('pop_size')
+            generations = request.form.get('generations')
+            mutation_rate = request.form.get('mutation_rate')
+            if pop_size:
+                kwargs['pop_size'] = int(pop_size)
+            if generations:
+                kwargs['generations'] = int(generations)
+            if mutation_rate:
+                kwargs['mutation_rate'] = float(mutation_rate)
 
         optimization = SalesmanOptimization.from_file(file_path, **kwargs)
         used_salesmans, best_routes = optimization.find_min_salesmans()
@@ -83,16 +85,18 @@ def manual_optimize():
                 dist_matrix.append(row)
         dist_matrix = np.array(dist_matrix)
 
-        pop_size = request.form.get('pop_size')
-        generations = request.form.get('generations')
-        mutation_rate = request.form.get('mutation_rate')
+        params_mode = request.form.get('params_mode', 'default')
         kwargs = {}
-        if pop_size is not None:
-            kwargs['pop_size'] = int(pop_size)
-        if generations is not None:
-            kwargs['generations'] = int(generations)
-        if mutation_rate is not None:
-            kwargs['mutation_rate'] = float(mutation_rate)
+        if params_mode == 'custom':
+            pop_size = request.form.get('pop_size')
+            generations = request.form.get('generations')
+            mutation_rate = request.form.get('mutation_rate')
+            if pop_size:
+                kwargs['pop_size'] = int(pop_size)
+            if generations:
+                kwargs['generations'] = int(generations)
+            if mutation_rate:
+                kwargs['mutation_rate'] = float(mutation_rate)
 
         optimization = SalesmanOptimization(
             dist_matrix=dist_matrix,
